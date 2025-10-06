@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useDexContract } from '@/hooks/useDexContract'
-import { Loader2, Plus, Minus } from 'lucide-react'
+import { Loader as Loader2, Plus, Minus } from 'lucide-react'
 
 // Mock token list - same as SwapForm
 const TOKENS = [

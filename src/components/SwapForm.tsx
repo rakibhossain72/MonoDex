@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useDexContract } from '@/hooks/useDexContract'
-import { ArrowUpDown, Loader2 } from 'lucide-react'
+import { ArrowUpDown, Loader as Loader2 } from 'lucide-react'
 
 // Mock token list - replace with actual token data
 const TOKENS = [
