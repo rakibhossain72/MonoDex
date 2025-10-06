@@ -1,4 +1,4 @@
-import { X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
+import { X, CircleCheck as CheckCircle, CircleAlert as AlertCircle, Loader as Loader2 } from 'lucide-react'
 
 interface TransactionModalProps {
   isOpen: boolean
