@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
-import { Plus, Minus } from 'lucide-react'
+import { Plus, Minus, ChevronDown } from 'lucide-react'
 import { Token, COMMON_TOKENS } from '@/types/token'
 import { TokenSelectModal } from '@/components/modals/TokenSelectModal'
 import { TransactionModal } from '@/components/modals/TransactionModal'
@@ -9,7 +9,7 @@ import { useDexContract } from '@/hooks/useDexContract'
 export function PoolPage() {
   const { isConnected } = useAccount()
   const { addLiquidity, removeLiquidity, isPending, isConfirming, error, hash, reserves } = useDexContract()
-  
+
   const [tokenA, setTokenA] = useState<Token>(COMMON_TOKENS[0])
   const [tokenB, setTokenB] = useState<Token>(COMMON_TOKENS[1])
   const [amountA, setAmountA] = useState('')
@@ -65,22 +65,20 @@ export function PoolPage() {
           <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
             <button
               onClick={() => setActiveTab('add')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-                activeTab === 'add'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${activeTab === 'add'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
             >
               <Plus className="w-4 h-4" />
               <span>Add</span>
             </button>
             <button
               onClick={() => setActiveTab('remove')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-                activeTab === 'remove'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${activeTab === 'remove'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
             >
               <Minus className="w-4 h-4" />
               <span>Remove</span>
@@ -95,24 +93,25 @@ export function PoolPage() {
                   <span className="text-sm text-gray-500">Token A</span>
                   <span className="text-sm text-gray-500">Balance: 0.00</span>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-2">
                   <input
                     type="number"
                     placeholder="0.0"
-                    value={amountA}
+                    value={amountB}
                     onChange={(e) => setAmountA(e.target.value)}
-                    className="flex-1 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400"
+                    className="flex-1 min-w-0 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
                   />
                   <button
                     onClick={() => openTokenSelect('A')}
-                    className="flex items-center space-x-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl px-3 py-2 transition-colors"
+                    className="flex items-center space-x-2 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 transition-colors flex-shrink-0"
                   >
-                    <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium text-gray-600">
+                    <div className="w-6 h-6 bg-gray-200 dark:bg-gray-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                         {tokenA.symbol.charAt(0)}
                       </span>
                     </div>
-                    <span className="font-medium text-gray-900">{tokenA.symbol}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">{tokenA.symbol}</span>
+                    <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                   </button>
                 </div>
               </div>
@@ -123,24 +122,25 @@ export function PoolPage() {
                   <span className="text-sm text-gray-500">Token B</span>
                   <span className="text-sm text-gray-500">Balance: 0.00</span>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-2">
                   <input
                     type="number"
                     placeholder="0.0"
                     value={amountB}
                     onChange={(e) => setAmountB(e.target.value)}
-                    className="flex-1 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400"
+                    className="flex-1 min-w-0 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
                   />
                   <button
                     onClick={() => openTokenSelect('B')}
-                    className="flex items-center space-x-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl px-3 py-2 transition-colors"
+                    className="flex items-center space-x-2 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 transition-colors flex-shrink-0"
                   >
-                    <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium text-gray-600">
+                    <div className="w-6 h-6 bg-gray-200 dark:bg-gray-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                         {tokenB.symbol.charAt(0)}
                       </span>
                     </div>
-                    <span className="font-medium text-gray-900">{tokenB.symbol}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">{tokenB.symbol}</span>
+                    <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                   </button>
                 </div>
               </div>

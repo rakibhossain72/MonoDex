@@ -12,7 +12,7 @@ export function SwapPage() {
   const { isConnected } = useAccount()
   const { swapTokens, isPending, isConfirming, error, hash } = useDexContract()
   const { slippage } = useSettings()
-  
+
   const [tokenIn, setTokenIn] = useState<Token>(COMMON_TOKENS[0])
   const [tokenOut, setTokenOut] = useState<Token>(COMMON_TOKENS[1])
   const [amountIn, setAmountIn] = useState('')
@@ -51,10 +51,12 @@ export function SwapPage() {
 
   const handleSwap = async () => {
     if (!amountIn || !tokenIn || !tokenOut) return
-    
+
     try {
       await swapTokens(tokenIn.address, tokenOut.address, amountIn)
       setIsTransactionModalOpen(true)
+      setAmountIn('')
+      setAmountOut('')
     } catch (err) {
       console.error('Swap failed:', err)
     }
@@ -66,7 +68,7 @@ export function SwapPage() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Swap</h2>
-            <button 
+            <button
               onClick={() => setIsSettingsOpen(true)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
@@ -81,13 +83,13 @@ export function SwapPage() {
                 <span className="text-sm text-gray-500 dark:text-gray-400">You pay</span>
                 <span className="text-sm text-gray-500 dark:text-gray-400">Balance: 0.00</span>
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center gap-2">
                 <input
                   type="number"
                   placeholder="0.0"
                   value={amountIn}
                   onChange={(e) => handleAmountInChange(e.target.value)}
-                  className="flex-1 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100 pr-3"
+                  className="flex-1 min-w-0 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
                 />
                 <button
                   onClick={() => openTokenSelect('in')}
@@ -120,13 +122,13 @@ export function SwapPage() {
                 <span className="text-sm text-gray-500 dark:text-gray-400">You receive</span>
                 <span className="text-sm text-gray-500 dark:text-gray-400">Balance: 0.00</span>
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center gap-2">
                 <input
                   type="number"
                   placeholder="0.0"
                   value={amountOut}
                   readOnly
-                  className="flex-1 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100 pr-3"
+                  className="flex-1 min-w-0 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
                 />
                 <button
                   onClick={() => openTokenSelect('out')}
@@ -164,12 +166,12 @@ export function SwapPage() {
             disabled={!isConnected || !amountIn || isPending || isConfirming}
             className="w-full mt-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-4 px-6 rounded-2xl transition-colors"
           >
-            {!isConnected 
-              ? 'Connect Wallet' 
-              : isPending 
-                ? 'Confirming...' 
-                : isConfirming 
-                  ? 'Processing...' 
+            {!isConnected
+              ? 'Connect Wallet'
+              : isPending
+                ? 'Confirming...'
+                : isConfirming
+                  ? 'Processing...'
                   : 'Swap'
             }
           </button>
@@ -179,14 +181,14 @@ export function SwapPage() {
       <TokenSelectModal
         isOpen={isTokenSelectOpen}
         onClose={() => setIsTokenSelectOpen(false)}
-        onSelect={handleTokenSelect}
+        onSelectToken={handleTokenSelect}
         selectedToken={selectingToken === 'in' ? tokenIn : tokenOut}
       />
 
       <TransactionModal
         isOpen={isTransactionModalOpen}
         onClose={() => setIsTransactionModalOpen(false)}
-        isPending={isPending}
+        status={isPending}
         isConfirming={isConfirming}
         hash={hash}
         error={error?.message}

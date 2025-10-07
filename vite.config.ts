@@ -8,6 +8,9 @@ export default defineConfig({
   server: {
     headers: {
       'Cross-Origin-Opener-Policy': 'unsafe-none'
+    },
+    watch: {
+      usePolling: true,
     }
   },
   optimizeDeps: {

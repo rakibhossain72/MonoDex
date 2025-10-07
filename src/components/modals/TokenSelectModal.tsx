@@ -17,6 +17,8 @@ export function TokenSelectModal({ isOpen, onClose, onSelectToken, selectedToken
     token.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  
+
   if (!isOpen) return null
 
   return (
