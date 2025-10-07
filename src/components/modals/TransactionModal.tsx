@@ -40,14 +40,14 @@ export function TransactionModal({ isOpen, onClose, status, hash, error }: Trans
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md mx-4 p-6">
+      <div className="relative bg-white rounded-2xl w-full max-w-md mx-4 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{getStatusText()}</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{getStatusText()}</h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
@@ -55,14 +55,14 @@ export function TransactionModal({ isOpen, onClose, status, hash, error }: Trans
           {getStatusIcon()}
           
           {status === 'pending' && (
-            <p className="text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-gray-600 text-center">
               Please wait while your transaction is being processed...
             </p>
           )}
 
           {status === 'success' && hash && (
             <div className="text-center space-y-2">
-              <p className="text-gray-600 dark:text-gray-400">Your transaction has been confirmed!</p>
+              <p className="text-gray-600">Your transaction has been confirmed!</p>
               <a
                 href={`https://sepolia.etherscan.io/tx/${hash}`}
                 target="_blank"
@@ -75,7 +75,7 @@ export function TransactionModal({ isOpen, onClose, status, hash, error }: Trans
           )}
 
           {status === 'error' && (
-            <p className="text-red-600 dark:text-red-400 text-center text-sm">
+            <p className="text-red-600 text-center text-sm">
               {error || 'An error occurred while processing your transaction.'}
             </p>
           )}
