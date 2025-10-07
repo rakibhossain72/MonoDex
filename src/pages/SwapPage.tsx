@@ -1,3 +1,13 @@
+import React, { useState } from 'react'
+import { useAccount } from 'wagmi'
+import { ArrowDown, ChevronDown, Settings } from 'lucide-react'
+import { Token, COMMON_TOKENS } from '@/types/token'
+import { useDexContract } from '@/hooks/useDexContract'
+import { useSettings } from '@/contexts/SettingsContext'
+import { TokenSelectModal } from '@/components/modals/TokenSelectModal'
+import { TransactionModal } from '@/components/modals/TransactionModal'
+import { SettingsModal } from '@/components/modals/SettingsModal'
+
 export function SwapPage() {
   const { isConnected } = useAccount()
   const { swapTokens, isPending, isConfirming, error, hash } = useDexContract()
