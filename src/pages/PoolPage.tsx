@@ -54,31 +54,33 @@ export function PoolPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8 max-w-md">
-        <div className="bg-white rounded-2xl border border-gray-200 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Pool</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Pool</h2>
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1 mb-6">
             <button
               onClick={() => setActiveTab('add')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${activeTab === 'add'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-                }`}
+              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${
+                activeTab === 'add'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
             >
               <Plus className="w-4 h-4" />
               <span>Add</span>
             </button>
             <button
               onClick={() => setActiveTab('remove')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${activeTab === 'remove'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-                }`}
+              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${
+                activeTab === 'remove'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
             >
               <Minus className="w-4 h-4" />
               <span>Remove</span>
@@ -88,16 +90,16 @@ export function PoolPage() {
           {activeTab === 'add' ? (
             <div className="space-y-4">
               {/* Token A Input */}
-              <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-500">Token A</span>
-                  <span className="text-sm text-gray-500">Balance: 0.00</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Token A</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Balance: 0.00</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
                     placeholder="0.0"
-                    value={amountB}
+                    value={amountA}
                     onChange={(e) => setAmountA(e.target.value)}
                     className="flex-1 min-w-0 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
                   />
@@ -117,10 +119,10 @@ export function PoolPage() {
               </div>
 
               {/* Token B Input */}
-              <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-500">Token B</span>
-                  <span className="text-sm text-gray-500">Balance: 0.00</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Token B</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Balance: 0.00</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -146,16 +148,16 @@ export function PoolPage() {
               </div>
 
               {reserves && (
-                <div className="bg-blue-50 rounded-xl p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">Pool Information</h3>
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Pool Information</h3>
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Reserve A:</span>
-                      <span className="text-gray-900">{parseFloat(reserves.reserveA).toFixed(4)} {tokenA.symbol}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Reserve A:</span>
+                      <span className="text-gray-900 dark:text-gray-100">{parseFloat(reserves.reserveA).toFixed(4)} {tokenA.symbol}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Reserve B:</span>
-                      <span className="text-gray-900">{parseFloat(reserves.reserveB).toFixed(4)} {tokenB.symbol}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Reserve B:</span>
+                      <span className="text-gray-900 dark:text-gray-100">{parseFloat(reserves.reserveB).toFixed(4)} {tokenB.symbol}</span>
                     </div>
                   </div>
                 </div>
@@ -164,35 +166,35 @@ export function PoolPage() {
               <button
                 onClick={handleAddLiquidity}
                 disabled={!isConnected || !amountA || !amountB || isPending || isConfirming}
-                className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-4 px-4 rounded-2xl transition-colors"
+                className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-4 px-4 rounded-2xl transition-colors"
               >
                 {!isConnected ? 'Connect Wallet' : isPending || isConfirming ? 'Adding Liquidity...' : 'Add Liquidity'}
               </button>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-500">Liquidity Amount</span>
-                  <span className="text-sm text-gray-500">Your Liquidity: 0.00</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Liquidity Amount</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Your Liquidity: 0.00</span>
                 </div>
                 <input
                   type="number"
                   placeholder="0.0"
                   value={liquidityAmount}
                   onChange={(e) => setLiquidityAmount(e.target.value)}
-                  className="w-full text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400"
+                  className="w-full text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
                 />
               </div>
 
-              <div className="text-center text-sm text-gray-500">
+              <div className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Remove liquidity from {tokenA.symbol}/{tokenB.symbol} pool
               </div>
 
               <button
                 onClick={handleRemoveLiquidity}
                 disabled={!isConnected || !liquidityAmount || isPending || isConfirming}
-                className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-4 px-4 rounded-2xl transition-colors"
+                className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-4 px-4 rounded-2xl transition-colors"
               >
                 {!isConnected ? 'Connect Wallet' : isPending || isConfirming ? 'Removing Liquidity...' : 'Remove Liquidity'}
               </button>

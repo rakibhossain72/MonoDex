@@ -31,6 +31,14 @@ export function SwapPage() {
     setIsTokenSelectOpen(false)
   }
 
+  const getTransactionStatus = () => {
+    if (isPending) return 'pending'
+    if (isConfirming) return 'pending'
+    if (error) return 'error'
+    if (hash) return 'success'
+    return null
+  }
+
   const openTokenSelect = (type: 'in' | 'out') => {
     setSelectingToken(type)
     setIsTokenSelectOpen(true)
@@ -164,7 +172,7 @@ export function SwapPage() {
           <button
             onClick={handleSwap}
             disabled={!isConnected || !amountIn || isPending || isConfirming}
-            className="w-full mt-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-4 px-6 rounded-2xl transition-colors"
+            className="w-full mt-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-4 px-6 rounded-2xl transition-colors"
           >
             {!isConnected
               ? 'Connect Wallet'
@@ -188,8 +196,7 @@ export function SwapPage() {
       <TransactionModal
         isOpen={isTransactionModalOpen}
         onClose={() => setIsTransactionModalOpen(false)}
-        status={isPending}
-        isConfirming={isConfirming}
+        status={getTransactionStatus()}
         hash={hash}
         error={error?.message}
       />

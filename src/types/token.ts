@@ -14,7 +14,7 @@ export const COMMON_TOKENS: Token[] = [
     decimals: 18,
   },
   {
-    address: '0xa0b86a33e6304c8749939df2c4b6ee7a8b8b8b8b8',
+    address: '0xD3193d5138a27B3776b2F5CA21f3eF95347260e3',
     symbol: 'USDC',
     name: 'USD Coin',
     decimals: 6,

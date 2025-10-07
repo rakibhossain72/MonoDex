@@ -9,7 +9,7 @@ import { ArrowUpDown, Loader as Loader2 } from 'lucide-react'
 // Mock token list - replace with actual token data
 const TOKENS = [
   { symbol: 'ETH', address: '0x0000000000000000000000000000000000000000', name: 'Ethereum' },
-  { symbol: 'USDC', address: '0xa0b86a33e6304c8749939df2c4b6ee7a8b8b8b8b8', name: 'USD Coin' },
+  { symbol: 'USDC', address: '0xD3193d5138a27B3776b2F5CA21f3eF95347260e3', name: 'USD Coin' },
   { symbol: 'DAI', address: '0x6b175474e89094c44da98b954eedeac495271d0f', name: 'Dai Stablecoin' },
 ]
 
