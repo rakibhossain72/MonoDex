@@ -101,18 +101,18 @@ export function PoolPage() {
                     placeholder="0.0"
                     value={amountA}
                     onChange={(e) => setAmountA(e.target.value)}
-                    className="flex-1 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100 pr-2"
+                    className="flex-1 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
                   />
                   <button
                     onClick={() => openTokenSelect('A')}
-                    className="flex items-center space-x-2 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-500 rounded-xl px-3 py-2 transition-colors flex-shrink-0"
+                    className="flex items-center space-x-2 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-500 rounded-2xl px-3 py-2 transition-colors min-w-0"
                   >
                     <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                         {tokenA.symbol.charAt(0)}
                       </span>
                     </div>
-                    <span className="font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                    <span className="font-medium text-gray-900 dark:text-gray-100 truncate">
                       {tokenA.symbol}
                     </span>
                     <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
@@ -132,18 +132,18 @@ export function PoolPage() {
                     placeholder="0.0"
                     value={amountB}
                     onChange={(e) => setAmountB(e.target.value)}
-                    className="flex-1 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100 pr-2"
+                    className="flex-1 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
                   />
                   <button
                     onClick={() => openTokenSelect('B')}
-                    className="flex items-center space-x-2 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-500 rounded-xl px-3 py-2 transition-colors flex-shrink-0"
+                    className="flex items-center space-x-2 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-500 rounded-2xl px-3 py-2 transition-colors min-w-0"
                   >
                     <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                         {tokenB.symbol.charAt(0)}
                       </span>
                     </div>
-                    <span className="font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                    <span className="font-medium text-gray-900 dark:text-gray-100 truncate">
                       {tokenB.symbol}
                     </span>
                     <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
