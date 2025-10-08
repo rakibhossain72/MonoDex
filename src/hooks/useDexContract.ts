@@ -1,7 +1,7 @@
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi'
 import { parseEther, formatEther } from 'viem'
 
-const DEX_CONTRACT_ADDRESS = import.meta.env.VITE_DEX_CONTRACT_ADDRESS as `0x${string}`
+const DEX_CONTRACT_ADDRESS = "0x31Bb5C3ce3d22F7328Fb3ff1F99F223272AF2B51";
 
 // MonoDEX ABI based on the interface
 const MONODEX_ABI = [
