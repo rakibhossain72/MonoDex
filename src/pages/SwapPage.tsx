@@ -9,10 +9,11 @@ import { TokenSelectModal } from '@/components/modals/TokenSelectModal'
 import { TransactionModal } from '@/components/modals/TransactionModal'
 import { SettingsModal } from '@/components/modals/SettingsModal'
 import { ApprovalModal } from '@/components/modals/ApprovalModal'
+import { formatEther } from 'viem'
 
 export function SwapPage() {
   const { isConnected } = useAccount()
-  const { swapTokens, isPending, isConfirming, error, hash, getAmountOut } = useDexContract()
+  const { swapTokens, isPending, isConfirming, error, hash } = useDexContract()
   const { slippage } = useSettings()
   
   const [tokenIn, setTokenIn] = useState<Token>(COMMON_TOKENS[0])
@@ -28,6 +29,7 @@ export function SwapPage() {
 
   // Token allowance hooks
   const tokenInAllowance = useTokenAllowance(tokenIn.address)
+  const tokenOutAllowance = useTokenAllowance(tokenOut.address)
 
   const handleTokenSelect = (token: Token) => {
     if (selectingToken === 'in') {
@@ -139,7 +141,7 @@ export function SwapPage() {
             <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">You pay</span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">Balance: 0.00</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">Balance: {formatEther(tokenInAllowance.balance ?? 0n) || 0.00}</span>
               </div>
               <div className="flex items-center gap-2">
                 <input
@@ -178,7 +180,7 @@ export function SwapPage() {
             <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">You receive</span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">Balance: 0.00</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">Balance: {formatEther(tokenOutAllowance.balance ?? 0n) || 0.00}</span>
               </div>
               <div className="flex items-center gap-2">
                 <input

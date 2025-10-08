@@ -19,7 +19,7 @@ export function PoolPage() {
 
   const { addLiquidity, removeLiquidity, isPending, isConfirming, error, hash } = useDexContract()
   console.log(tokenA.address, tokenB.address)
-  const { data: reserves, error: reservesError, isLoading: reservesLoading } = useReserves(tokenA.address, tokenB.address)
+  const { data: reserves, error: reservesError } = useReserves(tokenA.address, tokenB.address)
 
   // Token allowance hooks
   const tokenAAllowance = useTokenAllowance(tokenA.address)
