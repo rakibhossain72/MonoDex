@@ -11,14 +11,17 @@ import { ApprovalModal } from '@/components/modals/ApprovalModal'
 
 export function PoolPage() {
   const { isConnected } = useAccount()
+
+  // State declarations must come before hooks that depend on them
+  const [tokenA, setTokenA] = useState<Token>(COMMON_TOKENS[0])
+  const [tokenB, setTokenB] = useState<Token>(COMMON_TOKENS[1])
+  
   const { addLiquidity, removeLiquidity, isPending, isConfirming, error, hash, reserves } = useDexContract()
 
   // Token allowance hooks
   const tokenAAllowance = useTokenAllowance(tokenA.address)
   const tokenBAllowance = useTokenAllowance(tokenB.address)
 
-  const [tokenA, setTokenA] = useState<Token>(COMMON_TOKENS[0])
-  const [tokenB, setTokenB] = useState<Token>(COMMON_TOKENS[1])
   const [amountA, setAmountA] = useState('')
   const [amountB, setAmountB] = useState('')
   const [liquidityAmount, setLiquidityAmount] = useState('')
