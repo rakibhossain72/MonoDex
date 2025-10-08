@@ -14,7 +14,7 @@ export const COMMON_TOKENS: Token[] = [
     decimals: 18,
   },
   {
-    address: '0xD3193d5138a27B3776b2F5CA21f3eF95347260e3',
+    address: '0x1aEc00C7185aE6ee82EE4679C8c32b4F7aaC040e',
     symbol: 'TKB',
     name: 'Token B',
     decimals: 18,

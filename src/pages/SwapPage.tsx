@@ -28,7 +28,6 @@ export function SwapPage() {
 
   // Token allowance hooks
   const tokenInAllowance = useTokenAllowance(tokenIn.address)
-  const tokenOutAllowance = useTokenAllowance(tokenOut.address)
 
   const handleTokenSelect = (token: Token) => {
     if (selectingToken === 'in') {

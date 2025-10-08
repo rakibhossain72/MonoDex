@@ -8,6 +8,7 @@ import { TransactionModal } from '@/components/modals/TransactionModal'
 import { useDexContract } from '@/hooks/useDexContract'
 import { useTokenAllowance } from '@/hooks/useTokenAllowance'
 import { ApprovalModal } from '@/components/modals/ApprovalModal'
+import { useReserves } from '@/hooks/useReserves'
 
 export function PoolPage() {
   const { isConnected } = useAccount()
@@ -15,8 +16,10 @@ export function PoolPage() {
   // State declarations must come before hooks that depend on them
   const [tokenA, setTokenA] = useState<Token>(COMMON_TOKENS[0])
   const [tokenB, setTokenB] = useState<Token>(COMMON_TOKENS[1])
-  
-  const { addLiquidity, removeLiquidity, isPending, isConfirming, error, hash, reserves } = useDexContract()
+
+  const { addLiquidity, removeLiquidity, isPending, isConfirming, error, hash } = useDexContract()
+  console.log(tokenA.address, tokenB.address)
+  const { data: reserves, error: reservesError, isLoading: reservesLoading } = useReserves(tokenA.address, tokenB.address)
 
   // Token allowance hooks
   const tokenAAllowance = useTokenAllowance(tokenA.address)
@@ -31,6 +34,13 @@ export function PoolPage() {
   const [activeTab, setActiveTab] = useState<'add' | 'remove'>('add')
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false)
   const [pendingApprovalToken, setPendingApprovalToken] = useState<Token | null>(null)
+
+
+  console.log('Reserves:', reserves)
+  console.log('Reserves Error:', reservesError)
+  console.log('Token A Allowance:', tokenAAllowance.allowance ? formatEther(tokenAAllowance.allowance) : 'N/A')
+
+
 
   const handleTokenSelect = (token: Token) => {
     if (selectingToken === 'A') {
@@ -47,7 +57,7 @@ export function PoolPage() {
 
   const handleAddLiquidity = () => {
     if (!amountA || !amountB || !tokenA || !tokenB) return
-    
+
     // Check tokenA allowance (skip for ETH)
     if (tokenA.address !== '0x0000000000000000000000000000000000000000') {
       if (!tokenAAllowance.hasAllowance(amountA)) {
@@ -56,7 +66,7 @@ export function PoolPage() {
         return
       }
     }
-    
+
     // Check tokenB allowance (skip for ETH)
     if (tokenB.address !== '0x0000000000000000000000000000000000000000') {
       if (!tokenBAllowance.hasAllowance(amountB)) {
@@ -65,7 +75,7 @@ export function PoolPage() {
         return
       }
     }
-    
+
     setIsTransactionModalOpen(true)
     addLiquidity(tokenA.address, tokenB.address, amountA, amountB)
   }
@@ -84,14 +94,14 @@ export function PoolPage() {
   React.useEffect(() => {
     const tokenAApproved = tokenAAllowance.isConfirmed && pendingApprovalToken?.address === tokenA.address
     const tokenBApproved = tokenBAllowance.isConfirmed && pendingApprovalToken?.address === tokenB.address
-    
+
     if (tokenAApproved || tokenBApproved) {
       setIsApprovalModalOpen(false)
       setPendingApprovalToken(null)
-      
+
       if (tokenAApproved) tokenAAllowance.refetchAllowance()
       if (tokenBApproved) tokenBAllowance.refetchAllowance()
-      
+
       // Auto-proceed with add liquidity after approval
       setTimeout(() => {
         handleAddLiquidity()
@@ -125,22 +135,20 @@ export function PoolPage() {
           <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1 mb-6">
             <button
               onClick={() => setActiveTab('add')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-                activeTab === 'add'
+              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${activeTab === 'add'
                   ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
+                }`}
             >
               <Plus className="w-4 h-4" />
               <span>Add</span>
             </button>
             <button
               onClick={() => setActiveTab('remove')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-                activeTab === 'remove'
+              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${activeTab === 'remove'
                   ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
+                }`}
             >
               <Minus className="w-4 h-4" />
               <span>Remove</span>
@@ -213,11 +221,11 @@ export function PoolPage() {
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Reserve A:</span>
-                      <span className="text-gray-900 dark:text-gray-100">{parseFloat(reserves.reserveA).toFixed(4)} {tokenA.symbol}</span>
+                      <span className="text-gray-900 dark:text-gray-100">{Array.isArray(reserves) ? formatEther(reserves[0] || 0n): 0.0000} {tokenA.symbol}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Reserve B:</span>
-                      <span className="text-gray-900 dark:text-gray-100">{parseFloat(reserves.reserveB).toFixed(4)} {tokenB.symbol}</span>
+                      <span className="text-gray-900 dark:text-gray-100">{Array.isArray(reserves) ? formatEther(reserves[1] || 0n): 0.0000} {tokenB.symbol}</span>
                     </div>
                   </div>
                 </div>
@@ -295,8 +303,8 @@ export function PoolPage() {
           (pendingApprovalToken?.address === tokenB.address && tokenBAllowance.isConfirming)
         }
         error={
-          pendingApprovalToken?.address === tokenA.address 
-            ? tokenAAllowance.error?.message 
+          pendingApprovalToken?.address === tokenA.address
+            ? tokenAAllowance.error?.message
             : tokenBAllowance.error?.message
         }
       />
