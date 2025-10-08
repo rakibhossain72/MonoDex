@@ -4,14 +4,20 @@ import { ArrowDown, ChevronDown, Settings } from 'lucide-react'
 import { Token, COMMON_TOKENS } from '@/types/token'
 import { useDexContract } from '@/hooks/useDexContract'
 import { useSettings } from '@/contexts/SettingsContext'
+import { useTokenAllowance } from '@/hooks/useTokenAllowance'
 import { TokenSelectModal } from '@/components/modals/TokenSelectModal'
 import { TransactionModal } from '@/components/modals/TransactionModal'
 import { SettingsModal } from '@/components/modals/SettingsModal'
+import { ApprovalModal } from '@/components/modals/ApprovalModal'
 
 export function SwapPage() {
   const { isConnected } = useAccount()
   const { swapTokens, isPending, isConfirming, error, hash, getAmountOut } = useDexContract()
   const { slippage } = useSettings()
+  
+  // Token allowance hooks
+  const tokenInAllowance = useTokenAllowance(tokenIn.address)
+  const tokenOutAllowance = useTokenAllowance(tokenOut.address)
 
   const [tokenIn, setTokenIn] = useState<Token>(COMMON_TOKENS[0])
   const [tokenOut, setTokenOut] = useState<Token>(COMMON_TOKENS[1])
@@ -21,6 +27,8 @@ export function SwapPage() {
   const [selectingToken, setSelectingToken] = useState<'in' | 'out'>('in')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false)
+  const [pendingApprovalToken, setPendingApprovalToken] = useState<Token | null>(null)
 
   const handleTokenSelect = (token: Token) => {
     if (selectingToken === 'in') {
@@ -72,6 +80,15 @@ export function SwapPage() {
   const handleSwap = async () => {
     if (!amountIn || !tokenIn || !tokenOut) return
 
+    // Check if tokenIn needs approval (skip for ETH)
+    if (tokenIn.address !== '0x0000000000000000000000000000000000000000') {
+      if (!tokenInAllowance.hasAllowance(amountIn)) {
+        setPendingApprovalToken(tokenIn)
+        setIsApprovalModalOpen(true)
+        return
+      }
+    }
+
     // Calculate minimum amount out based on slippage
     const minAmountOut = (parseFloat(amountOut) * (100 - slippage) / 100).toString()
 
@@ -82,6 +99,27 @@ export function SwapPage() {
       console.error('Swap failed:', err)
     }
   }
+
+  const handleApproval = () => {
+    if (pendingApprovalToken) {
+      if (pendingApprovalToken.address === tokenIn.address) {
+        tokenInAllowance.approveToken()
+      }
+    }
+  }
+
+  // Handle approval completion
+  React.useEffect(() => {
+    if (tokenInAllowance.isConfirmed && pendingApprovalToken) {
+      setIsApprovalModalOpen(false)
+      setPendingApprovalToken(null)
+      tokenInAllowance.refetchAllowance()
+      // Auto-proceed with swap after approval
+      setTimeout(() => {
+        handleSwap()
+      }, 1000)
+    }
+  }, [tokenInAllowance.isConfirmed])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -217,6 +255,19 @@ export function SwapPage() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      <ApprovalModal
+        isOpen={isApprovalModalOpen}
+        onClose={() => {
+          setIsApprovalModalOpen(false)
+          setPendingApprovalToken(null)
+        }}
+        onApprove={handleApproval}
+        token={pendingApprovalToken || tokenIn}
+        isPending={tokenInAllowance.isPending}
+        isConfirming={tokenInAllowance.isConfirming}
+        error={tokenInAllowance.error?.message}
       />
     </div>
   )

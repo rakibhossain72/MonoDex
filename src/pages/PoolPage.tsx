@@ -6,10 +6,16 @@ import { Token, COMMON_TOKENS } from '@/types/token'
 import { TokenSelectModal } from '@/components/modals/TokenSelectModal'
 import { TransactionModal } from '@/components/modals/TransactionModal'
 import { useDexContract } from '@/hooks/useDexContract'
+import { useTokenAllowance } from '@/hooks/useTokenAllowance'
+import { ApprovalModal } from '@/components/modals/ApprovalModal'
 
 export function PoolPage() {
   const { isConnected } = useAccount()
   const { addLiquidity, removeLiquidity, isPending, isConfirming, error, hash, reserves } = useDexContract()
+
+  // Token allowance hooks
+  const tokenAAllowance = useTokenAllowance(tokenA.address)
+  const tokenBAllowance = useTokenAllowance(tokenB.address)
 
   const [tokenA, setTokenA] = useState<Token>(COMMON_TOKENS[0])
   const [tokenB, setTokenB] = useState<Token>(COMMON_TOKENS[1])
@@ -20,6 +26,8 @@ export function PoolPage() {
   const [selectingToken, setSelectingToken] = useState<'A' | 'B'>('A')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'add' | 'remove'>('add')
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false)
+  const [pendingApprovalToken, setPendingApprovalToken] = useState<Token | null>(null)
 
   const handleTokenSelect = (token: Token) => {
     if (selectingToken === 'A') {
@@ -36,9 +44,57 @@ export function PoolPage() {
 
   const handleAddLiquidity = () => {
     if (!amountA || !amountB || !tokenA || !tokenB) return
+    
+    // Check tokenA allowance (skip for ETH)
+    if (tokenA.address !== '0x0000000000000000000000000000000000000000') {
+      if (!tokenAAllowance.hasAllowance(amountA)) {
+        setPendingApprovalToken(tokenA)
+        setIsApprovalModalOpen(true)
+        return
+      }
+    }
+    
+    // Check tokenB allowance (skip for ETH)
+    if (tokenB.address !== '0x0000000000000000000000000000000000000000') {
+      if (!tokenBAllowance.hasAllowance(amountB)) {
+        setPendingApprovalToken(tokenB)
+        setIsApprovalModalOpen(true)
+        return
+      }
+    }
+    
     setIsTransactionModalOpen(true)
     addLiquidity(tokenA.address, tokenB.address, amountA, amountB)
   }
+
+  const handleApproval = () => {
+    if (pendingApprovalToken) {
+      if (pendingApprovalToken.address === tokenA.address) {
+        tokenAAllowance.approveToken()
+      } else if (pendingApprovalToken.address === tokenB.address) {
+        tokenBAllowance.approveToken()
+      }
+    }
+  }
+
+  // Handle approval completion
+  React.useEffect(() => {
+    const tokenAApproved = tokenAAllowance.isConfirmed && pendingApprovalToken?.address === tokenA.address
+    const tokenBApproved = tokenBAllowance.isConfirmed && pendingApprovalToken?.address === tokenB.address
+    
+    if (tokenAApproved || tokenBApproved) {
+      setIsApprovalModalOpen(false)
+      setPendingApprovalToken(null)
+      
+      if (tokenAApproved) tokenAAllowance.refetchAllowance()
+      if (tokenBApproved) tokenBAllowance.refetchAllowance()
+      
+      // Auto-proceed with add liquidity after approval
+      setTimeout(() => {
+        handleAddLiquidity()
+      }, 1000)
+    }
+  }, [tokenAAllowance.isConfirmed, tokenBAllowance.isConfirmed])
 
   const handleRemoveLiquidity = () => {
     if (!liquidityAmount || !tokenA || !tokenB) return
@@ -217,6 +273,29 @@ export function PoolPage() {
         status={getTransactionStatus()}
         hash={hash}
         error={error?.message}
+      />
+
+      <ApprovalModal
+        isOpen={isApprovalModalOpen}
+        onClose={() => {
+          setIsApprovalModalOpen(false)
+          setPendingApprovalToken(null)
+        }}
+        onApprove={handleApproval}
+        token={pendingApprovalToken || tokenA}
+        isPending={
+          (pendingApprovalToken?.address === tokenA.address && tokenAAllowance.isPending) ||
+          (pendingApprovalToken?.address === tokenB.address && tokenBAllowance.isPending)
+        }
+        isConfirming={
+          (pendingApprovalToken?.address === tokenA.address && tokenAAllowance.isConfirming) ||
+          (pendingApprovalToken?.address === tokenB.address && tokenBAllowance.isConfirming)
+        }
+        error={
+          pendingApprovalToken?.address === tokenA.address 
+            ? tokenAAllowance.error?.message 
+            : tokenBAllowance.error?.message
+        }
       />
     </div>
   )
