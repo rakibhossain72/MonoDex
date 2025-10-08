@@ -16,9 +16,9 @@ export function Header() {
           <div className="flex flex-col">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">U</span>
+                <span className="text-white font-bold text-sm">M</span>
               </div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Uniswap</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">MonoDEX</h1>
             </div>
             <p className="text-red-500 text-xs mt-1">⚠️ Testnet Only</p>
           </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
+import { formatEther } from 'viem'
 import { Plus, Minus, ChevronDown } from 'lucide-react'
 import { Token, COMMON_TOKENS } from '@/types/token'
 import { TokenSelectModal } from '@/components/modals/TokenSelectModal'

@@ -10,7 +10,7 @@ import { SettingsModal } from '@/components/modals/SettingsModal'
 
 export function SwapPage() {
   const { isConnected } = useAccount()
-  const { swapTokens, isPending, isConfirming, error, hash } = useDexContract()
+  const { swapTokens, isPending, isConfirming, error, hash, getAmountOut } = useDexContract()
   const { slippage } = useSettings()
 
   const [tokenIn, setTokenIn] = useState<Token>(COMMON_TOKENS[0])
@@ -53,18 +53,31 @@ export function SwapPage() {
 
   const handleAmountInChange = (value: string) => {
     setAmountIn(value)
-    // Simple 1:1 rate for demo
-    setAmountOut(value)
+    
+    // Calculate estimated output using contract
+    if (value && tokenIn && tokenOut) {
+      // For demo purposes, we'll use a simple calculation
+      // In production, you'd want to fetch actual reserves and calculate
+      const amount = parseFloat(value)
+      if (!isNaN(amount)) {
+        // Apply 0.3% fee simulation
+        const output = amount * 0.997
+        setAmountOut(output.toFixed(6))
+      }
+    } else {
+      setAmountOut('')
+    }
   }
 
   const handleSwap = async () => {
     if (!amountIn || !tokenIn || !tokenOut) return
 
+    // Calculate minimum amount out based on slippage
+    const minAmountOut = (parseFloat(amountOut) * (100 - slippage) / 100).toString()
+
     try {
-      await swapTokens(tokenIn.address, tokenOut.address, amountIn)
+      swapTokens(tokenIn.address, tokenOut.address, amountIn, minAmountOut)
       setIsTransactionModalOpen(true)
-      setAmountIn('')
-      setAmountOut('')
     } catch (err) {
       console.error('Swap failed:', err)
     }
