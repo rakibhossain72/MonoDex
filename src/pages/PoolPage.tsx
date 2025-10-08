@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { formatEther } from 'viem'
 import { Plus, Minus, ChevronDown } from 'lucide-react'
