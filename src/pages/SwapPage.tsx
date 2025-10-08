@@ -15,10 +15,6 @@ export function SwapPage() {
   const { swapTokens, isPending, isConfirming, error, hash, getAmountOut } = useDexContract()
   const { slippage } = useSettings()
   
-  // Token allowance hooks
-  const tokenInAllowance = useTokenAllowance(tokenIn.address)
-  const tokenOutAllowance = useTokenAllowance(tokenOut.address)
-
   const [tokenIn, setTokenIn] = useState<Token>(COMMON_TOKENS[0])
   const [tokenOut, setTokenOut] = useState<Token>(COMMON_TOKENS[1])
   const [amountIn, setAmountIn] = useState('')
@@ -29,6 +25,10 @@ export function SwapPage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false)
   const [pendingApprovalToken, setPendingApprovalToken] = useState<Token | null>(null)
+
+  // Token allowance hooks
+  const tokenInAllowance = useTokenAllowance(tokenIn.address)
+  const tokenOutAllowance = useTokenAllowance(tokenOut.address)
 
   const handleTokenSelect = (token: Token) => {
     if (selectingToken === 'in') {
