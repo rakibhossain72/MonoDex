@@ -38,7 +38,7 @@ const ERC20_ABI = [
   }
 ] as const
 
-const DEX_CONTRACT_ADDRESS = import.meta.env.VITE_DEX_CONTRACT_ADDRESS as `0x${string}`
+const DEX_CONTRACT_ADDRESS = "0x31Bb5C3ce3d22F7328Fb3ff1F99F223272AF2B51" as `0x${string}`
 
 export function useTokenAllowance(tokenAddress: string) {
   const { address } = useAccount()
@@ -54,9 +54,9 @@ export function useTokenAllowance(tokenAddress: string) {
     address: tokenAddress as `0x${string}`,
     abi: ERC20_ABI,
     functionName: 'allowance',
-    args: address && DEX_CONTRACT_ADDRESS ? [address, DEX_CONTRACT_ADDRESS] : undefined,
+    args: address ? [address, DEX_CONTRACT_ADDRESS] : undefined,
     query: {
-      enabled: !!address && !!tokenAddress && tokenAddress !== '0x0000000000000000000000000000000000000000'
+      enabled: !!address && !!tokenAddress && tokenAddress !== '0x0000000000000000000000000000000000000000' && tokenAddress.length === 42
     }
   })
 
@@ -67,7 +67,7 @@ export function useTokenAllowance(tokenAddress: string) {
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && !!tokenAddress && tokenAddress !== '0x0000000000000000000000000000000000000000'
+      enabled: !!address && !!tokenAddress && tokenAddress !== '0x0000000000000000000000000000000000000000' && tokenAddress.length === 42
     }
   })
 
@@ -77,17 +77,21 @@ export function useTokenAllowance(tokenAddress: string) {
     abi: ERC20_ABI,
     functionName: 'decimals',
     query: {
-      enabled: !!tokenAddress && tokenAddress !== '0x0000000000000000000000000000000000000000'
+      enabled: !!tokenAddress && tokenAddress !== '0x0000000000000000000000000000000000000000' && tokenAddress.length === 42
     }
   })
 
   // Check if allowance is sufficient for a given amount
   const hasAllowance = (amount: string) => {
+    console.log('Checking allowance for:', { tokenAddress, amount, allowance, decimals })
+    
     if (!allowance || !decimals) return false
     if (tokenAddress === '0x0000000000000000000000000000000000000000') return true // ETH doesn't need approval
+    if (tokenAddress.length !== 42) return false // Invalid address length
     
     try {
       const requiredAmount = parseUnits(amount, decimals)
+      console.log('Required amount:', requiredAmount, 'Current allowance:', allowance)
       return allowance >= requiredAmount
     } catch {
       return false
@@ -96,7 +100,22 @@ export function useTokenAllowance(tokenAddress: string) {
 
   // Approve unlimited allowance
   const approveToken = () => {
-    if (!address || tokenAddress === '0x0000000000000000000000000000000000000000') return
+    console.log('Attempting to approve token:', { tokenAddress, address, DEX_CONTRACT_ADDRESS })
+    
+    if (!address) {
+      console.error('No user address available')
+      return
+    }
+    
+    if (tokenAddress === '0x0000000000000000000000000000000000000000') {
+      console.log('ETH does not need approval')
+      return
+    }
+    
+    if (tokenAddress.length !== 42) {
+      console.error('Invalid token address length:', tokenAddress)
+      return
+    }
     
     writeContract({
       address: tokenAddress as `0x${string}`,
