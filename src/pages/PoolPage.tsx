@@ -5,21 +5,21 @@ import { Plus, Minus, ChevronDown } from 'lucide-react'
 import { Token, COMMON_TOKENS } from '@/types/token'
 import { TokenSelectModal } from '@/components/modals/TokenSelectModal'
 import { TransactionModal } from '@/components/modals/TransactionModal'
-import { useDexContract } from '@/hooks/useDexContract'
 import { useTokenAllowance } from '@/hooks/useTokenAllowance'
 import { ApprovalModal } from '@/components/modals/ApprovalModal'
 import { useReserves } from '@/hooks/useReserves'
+import { useDexPool } from '@/hooks/useDexPool'
 
 export function PoolPage() {
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
 
   // State declarations must come before hooks that depend on them
   const [tokenA, setTokenA] = useState<Token>(COMMON_TOKENS[0])
   const [tokenB, setTokenB] = useState<Token>(COMMON_TOKENS[1])
 
-  const { addLiquidity, removeLiquidity, isPending, isConfirming, error, hash } = useDexContract()
+  const { addLiquidity, removeLiquidity, getPairId, liquidityBalance, isPending, isConfirming, error, hash } = useDexPool()
   console.log(tokenA.address, tokenB.address)
-  const { data: reserves, error: reservesError } = useReserves(tokenA.address, tokenB.address)
+  const { data: reserves } = useReserves(tokenA.address, tokenB.address)
 
   // Token allowance hooks
   const tokenAAllowance = useTokenAllowance(tokenA.address)
@@ -35,10 +35,10 @@ export function PoolPage() {
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false)
   const [pendingApprovalToken, setPendingApprovalToken] = useState<Token | null>(null)
 
+  const pairId = getPairId(tokenA.address, tokenB.address).data
+  const lpBalance = liquidityBalance(pairId || '0', address || '0').data
+  console.log('LP Balance:', lpBalance ? formatEther(lpBalance) : '0.00')
 
-  console.log('Reserves:', reserves)
-  console.log('Reserves Error:', reservesError)
-  console.log('Token A Allowance:', tokenAAllowance.allowance ? formatEther(tokenAAllowance.allowance) : 'N/A')
 
 
 
@@ -244,7 +244,7 @@ export function PoolPage() {
               <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-500 dark:text-gray-400">Liquidity Amount</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Your Liquidity: 0.00</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Your Liquidity: {lpBalance ? formatEther(lpBalance) : '0.00'}</span>
                 </div>
                 <input
                   type="number"

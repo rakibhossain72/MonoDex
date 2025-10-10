@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { ArrowDown, ChevronDown, Settings } from 'lucide-react'
 import { Token, COMMON_TOKENS } from '@/types/token'
-import { useDexContract } from '@/hooks/useDexContract'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useTokenAllowance } from '@/hooks/useTokenAllowance'
 import { TokenSelectModal } from '@/components/modals/TokenSelectModal'
@@ -10,10 +9,12 @@ import { TransactionModal } from '@/components/modals/TransactionModal'
 import { SettingsModal } from '@/components/modals/SettingsModal'
 import { ApprovalModal } from '@/components/modals/ApprovalModal'
 import { formatEther } from 'viem'
+import { useDexSwap } from '@/hooks/useDexSwap'
 
 export function SwapPage() {
   const { isConnected } = useAccount()
-  const { swapTokens, isPending, isConfirming, error, hash } = useDexContract()
+  // const { swapTokens, isPending, isConfirming, error, hash } = useDexContract()
+  const { swapTokens, isPending, isConfirming, error, hash } = useDexSwap()
   const { slippage } = useSettings()
   
   const [tokenIn, setTokenIn] = useState<Token>(COMMON_TOKENS[0])
