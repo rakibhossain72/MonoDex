@@ -61,23 +61,73 @@ yarn dev
 ## 🏗 Project Structure
 
 ```
-mono-dex/
-├── public/                 # Static assets
-├── src/
-│   ├── components/        # React components
-│   │   ├── Swap/         # Swap interface
-│   │   ├── Liquidity/    # Liquidity management
-│   │   └── Common/       # Shared components
-│   ├── contracts/        # Contract ABIs and addresses
-│   ├── hooks/            # Custom React hooks
-│   ├── utils/            # Utility functions
-│   ├── types/            # TypeScript type definitions
-│   └── styles/           # Global styles
-├── contracts/            # Solidity smart contracts
-│   ├── MonoDex.sol
-│   ├── MonoERC20.sol
-│   └── MonoRouter.sol
-└── ...
+MonoDex
+├── contracts
+│   ├── foundry.toml
+│   ├── .gitignore
+│   ├── .gitmodules
+│   ├── lib
+│   │   ├── forge-std
+│   │   └── openzeppelin-contracts
+│   ├── README.md
+│   ├── remappings.txt
+│   ├── script
+│   │   └── DeployAndProvideLiquidity.s.sol
+│   ├── src
+│   │   ├── ERC20Mock.sol
+│   │   └── MonoDEX.sol
+│   └── test
+│       └── MonoDEX.t.sol
+├── eslint.config.js
+├── .gitignore
+├── .gitmodules
+├── index.html
+├── package.json
+├── package-lock.json
+├── postcss.config.js
+├── README.md
+├── src
+│   ├── App.tsx
+│   ├── components
+│   │   ├── Footer.tsx
+│   │   ├── Header.tsx
+│   │   ├── LiquidityForm.tsx
+│   │   ├── modals
+│   │   │   ├── ApprovalModal.tsx
+│   │   │   ├── SettingsModal.tsx
+│   │   │   ├── TokenSelectModal.tsx
+│   │   │   └── TransactionModal.tsx
+│   │   ├── SwapForm.tsx
+│   │   └── ui
+│   │       ├── Button.tsx
+│   │       ├── Card.tsx
+│   │       └── Input.tsx
+│   ├── config
+│   │   └── wagmi.ts
+│   ├── contexts
+│   │   ├── SettingsContext.tsx
+│   │   └── ThemeContext.tsx
+│   ├── hooks
+│   │   ├── useDexContract.ts
+│   │   ├── useDexPool.ts
+│   │   ├── useDexSwap.ts
+│   │   ├── useReserves.ts
+│   │   └── useTokenAllowance.ts
+│   ├── index.css
+│   ├── lib
+│   │   └── utils.ts
+│   ├── main.tsx
+│   ├── pages
+│   │   ├── PoolPage.tsx
+│   │   └── SwapPage.tsx
+│   ├── types
+│   │   └── token.ts
+│   └── vite-env.d.ts
+├── tailwind.config.js
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
 ```
 
 ## 🔗 Contract Addresses (Sepolia)
