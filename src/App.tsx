@@ -9,6 +9,7 @@ import { SettingsProvider } from '@/contexts/SettingsContext'
 import { Header } from '@/components/Header'
 import { SwapPage } from '@/pages/SwapPage'
 import { PoolPage } from '@/pages/PoolPage'
+import {Footer} from '@/components/Footer'
 
 const queryClient = new QueryClient()
 
@@ -26,6 +27,7 @@ function App() {
                     <Route path="/" element={<SwapPage />} />
                     <Route path="/pool" element={<PoolPage />} />
                   </Routes>
+                  <Footer />
                 </div>
               </Router>
             </RainbowKitProvider>
