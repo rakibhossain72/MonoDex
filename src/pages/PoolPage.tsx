@@ -39,8 +39,104 @@ export function PoolPage() {
   const lpBalance = liquidityBalance(pairId || '0', address || '0').data
   console.log('LP Balance:', lpBalance ? formatEther(lpBalance) : '0.00')
 
+  // Format balance with truncation
+  const formatBalance = (balance: bigint | null | undefined): string => {
+    if (!balance) return '0.00'
+    
+    const balanceStr = formatEther(balance)
+    const balanceNum = parseFloat(balanceStr)
+    
+    if (balanceNum === 0) return '0.00'
+    if (balanceNum < 0.000001) return '<0.000001'
+    if (balanceNum < 1) return balanceNum.toFixed(6)
+    if (balanceNum < 1000) return balanceNum.toFixed(4)
+    if (balanceNum < 10000) return balanceNum.toFixed(2)
+    
+    // For large numbers, use compact notation
+    if (balanceNum >= 1000000) {
+      return (balanceNum / 1000000).toFixed(2) + 'M'
+    }
+    if (balanceNum >= 1000) {
+      return (balanceNum / 1000).toFixed(2) + 'K'
+    }
+    
+    return balanceNum.toFixed(2)
+  }
 
+  // Enhanced add liquidity button disable logic
+  const isAddLiquidityDisabled = (): boolean => {
+    if (!isConnected) return true
+    if (!amountA || !amountB) return true
+    if (isPending || isConfirming) return true
+    
+    const amountANum = parseFloat(amountA)
+    const amountBNum = parseFloat(amountB)
+    
+    if (isNaN(amountANum) || amountANum <= 0 || isNaN(amountBNum) || amountBNum <= 0) return true
+    
+    // Check if user has sufficient balance for both tokens
+    const userBalanceA = tokenAAllowance.balance ? parseFloat(formatEther(tokenAAllowance.balance)) : 0
+    const userBalanceB = tokenBAllowance.balance ? parseFloat(formatEther(tokenBAllowance.balance)) : 0
+    
+    if (amountANum > userBalanceA || amountBNum > userBalanceB) return true
+    
+    // Check if tokens are the same
+    if (tokenA.address === tokenB.address) return true
+    
+    return false
+  }
 
+  // Enhanced remove liquidity button disable logic
+  const isRemoveLiquidityDisabled = (): boolean => {
+    if (!isConnected) return true
+    if (!liquidityAmount) return true
+    if (isPending || isConfirming) return true
+    
+    const liquidityAmountNum = parseFloat(liquidityAmount)
+    if (isNaN(liquidityAmountNum) || liquidityAmountNum <= 0) return true
+    
+    // Check if user has sufficient LP tokens
+    const userLpBalance = lpBalance ? parseFloat(formatEther(lpBalance)) : 0
+    if (liquidityAmountNum > userLpBalance) return true
+    
+    // Check if tokens are the same
+    if (tokenA.address === tokenB.address) return true
+    
+    return false
+  }
+
+  // Get add liquidity button text
+  const getAddLiquidityButtonText = (): string => {
+    if (!isConnected) return 'Connect Wallet'
+    if (isPending || isConfirming) return 'Adding Liquidity...'
+    
+    const amountANum = parseFloat(amountA)
+    const amountBNum = parseFloat(amountB)
+    const userBalanceA = tokenAAllowance.balance ? parseFloat(formatEther(tokenAAllowance.balance)) : 0
+    const userBalanceB = tokenBAllowance.balance ? parseFloat(formatEther(tokenBAllowance.balance)) : 0
+    
+    if (amountANum > userBalanceA) return `Insufficient ${tokenA.symbol}`
+    if (amountBNum > userBalanceB) return `Insufficient ${tokenB.symbol}`
+    if (tokenA.address === tokenB.address) return 'Select Different Tokens'
+    if (!amountA || !amountB) return 'Enter Amounts'
+    
+    return 'Add Liquidity'
+  }
+
+  // Get remove liquidity button text
+  const getRemoveLiquidityButtonText = (): string => {
+    if (!isConnected) return 'Connect Wallet'
+    if (isPending || isConfirming) return 'Removing Liquidity...'
+    
+    const liquidityAmountNum = parseFloat(liquidityAmount)
+    const userLpBalance = lpBalance ? parseFloat(formatEther(lpBalance)) : 0
+    
+    if (liquidityAmountNum > userLpBalance) return 'Insufficient Liquidity'
+    if (tokenA.address === tokenB.address) return 'Select Different Tokens'
+    if (!liquidityAmount) return 'Enter Amount'
+    
+    return 'Remove Liquidity'
+  }
 
   const handleTokenSelect = (token: Token) => {
     if (selectingToken === 'A') {
@@ -161,7 +257,9 @@ export function PoolPage() {
               <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-500 dark:text-gray-400">Token A</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Balance: 0.00</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Balance: {formatBalance(tokenAAllowance.balance)}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -190,7 +288,9 @@ export function PoolPage() {
               <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-500 dark:text-gray-400">Token B</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Balance: 0.00</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Balance: {formatBalance(tokenBAllowance.balance)}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -221,11 +321,15 @@ export function PoolPage() {
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Reserve A:</span>
-                      <span className="text-gray-900 dark:text-gray-100">{Array.isArray(reserves) ? formatEther(reserves[0] || 0n): 0.0000} {tokenA.symbol}</span>
+                      <span className="text-gray-900 dark:text-gray-100">
+                        {Array.isArray(reserves) ? formatBalance(reserves[0]) : '0.00'} {tokenA.symbol}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Reserve B:</span>
-                      <span className="text-gray-900 dark:text-gray-100">{Array.isArray(reserves) ? formatEther(reserves[1] || 0n): 0.0000} {tokenB.symbol}</span>
+                      <span className="text-gray-900 dark:text-gray-100">
+                        {Array.isArray(reserves) ? formatBalance(reserves[1]) : '0.00'} {tokenB.symbol}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -233,10 +337,10 @@ export function PoolPage() {
 
               <button
                 onClick={handleAddLiquidity}
-                disabled={!isConnected || !amountA || !amountB || isPending || isConfirming}
+                disabled={isAddLiquidityDisabled()}
                 className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-4 px-4 rounded-2xl transition-colors"
               >
-                {!isConnected ? 'Connect Wallet' : isPending || isConfirming ? 'Adding Liquidity...' : 'Add Liquidity'}
+                {getAddLiquidityButtonText()}
               </button>
             </div>
           ) : (
@@ -244,7 +348,9 @@ export function PoolPage() {
               <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-500 dark:text-gray-400">Liquidity Amount</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Your Liquidity: {lpBalance ? formatEther(lpBalance) : '0.00'}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Your Liquidity: {formatBalance(lpBalance)}
+                  </span>
                 </div>
                 <input
                   type="number"
@@ -261,10 +367,10 @@ export function PoolPage() {
 
               <button
                 onClick={handleRemoveLiquidity}
-                disabled={!isConnected || !liquidityAmount || isPending || isConfirming}
+                disabled={isRemoveLiquidityDisabled()}
                 className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-4 px-4 rounded-2xl transition-colors"
               >
-                {!isConnected ? 'Connect Wallet' : isPending || isConfirming ? 'Removing Liquidity...' : 'Remove Liquidity'}
+                {getRemoveLiquidityButtonText()}
               </button>
             </div>
           )}

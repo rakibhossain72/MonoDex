@@ -13,7 +13,6 @@ import { useDexSwap } from '@/hooks/useDexSwap'
 
 export function SwapPage() {
   const { isConnected } = useAccount()
-  // const { swapTokens, isPending, isConfirming, error, hash } = useDexContract()
   const { swapTokens, isPending, isConfirming, error, hash } = useDexSwap()
   const { slippage } = useSettings()
   
@@ -31,6 +30,49 @@ export function SwapPage() {
   // Token allowance hooks
   const tokenInAllowance = useTokenAllowance(tokenIn.address)
   const tokenOutAllowance = useTokenAllowance(tokenOut.address)
+
+  // Format balance with truncation
+  const formatBalance = (balance: bigint | null | undefined): string => {
+    if (!balance) return '0.00'
+    
+    const balanceStr = formatEther(balance)
+    const balanceNum = parseFloat(balanceStr)
+    
+    if (balanceNum === 0) return '0.00'
+    if (balanceNum < 0.000001) return '<0.000001'
+    if (balanceNum < 1) return balanceNum.toFixed(6)
+    if (balanceNum < 1000) return balanceNum.toFixed(4)
+    if (balanceNum < 10000) return balanceNum.toFixed(2)
+    
+    // For large numbers, use compact notation
+    if (balanceNum >= 1000000) {
+      return (balanceNum / 1000000).toFixed(2) + 'M'
+    }
+    if (balanceNum >= 1000) {
+      return (balanceNum / 1000).toFixed(2) + 'K'
+    }
+    
+    return balanceNum.toFixed(2)
+  }
+
+  // Enhanced swap button disable logic
+  const isSwapDisabled = (): boolean => {
+    if (!isConnected) return true
+    if (!amountIn || !amountOut) return true
+    if (isPending || isConfirming) return true
+    
+    const amountInNum = parseFloat(amountIn)
+    if (isNaN(amountInNum) || amountInNum <= 0) return true
+    
+    // Check if user has sufficient balance
+    const userBalance = tokenInAllowance.balance ? parseFloat(formatEther(tokenInAllowance.balance)) : 0
+    if (amountInNum > userBalance) return true
+    
+    // Check if tokens are the same
+    if (tokenIn.address === tokenOut.address) return true
+    
+    return false
+  }
 
   const handleTokenSelect = (token: Token) => {
     if (selectingToken === 'in') {
@@ -142,12 +184,15 @@ export function SwapPage() {
             <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">You pay</span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">Balance: {formatEther(tokenInAllowance.balance ?? 0n) || 0.00}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  Balance: {formatBalance(tokenInAllowance.balance)}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
                   placeholder="0.0"
+                  min={0}
                   value={amountIn}
                   onChange={(e) => handleAmountInChange(e.target.value)}
                   className="flex-1 min-w-0 text-2xl font-medium bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
@@ -181,7 +226,9 @@ export function SwapPage() {
             <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">You receive</span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">Balance: {formatEther(tokenOutAllowance.balance ?? 0n) || 0.00}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  Balance: {formatBalance(tokenOutAllowance.balance)}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <input
@@ -224,7 +271,7 @@ export function SwapPage() {
 
           <button
             onClick={handleSwap}
-            disabled={!isConnected || !amountIn || isPending || isConfirming}
+            disabled={isSwapDisabled()}
             className="w-full mt-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-4 px-6 rounded-2xl transition-colors"
           >
             {!isConnected
@@ -233,7 +280,11 @@ export function SwapPage() {
                 ? 'Confirming...'
                 : isConfirming
                   ? 'Processing...'
-                  : 'Swap'
+                  : parseFloat(amountIn) > (tokenInAllowance.balance ? parseFloat(formatEther(tokenInAllowance.balance)) : 0)
+                    ? 'Insufficient Balance'
+                    : tokenIn.address === tokenOut.address
+                      ? 'Select Different Tokens'
+                      : 'Swap'
             }
           </button>
         </div>
